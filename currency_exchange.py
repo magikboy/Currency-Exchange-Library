@@ -582,7 +582,8 @@ def get_supported_currencies() -> List[str]:
     return _default_exchange.get_supported_currencies()
 
 
-if __name__ == "__main__":
+def main():
+    """Main entry point for console script."""
     # Example usage and demonstration
     print("Currency Exchange Library Demo")
     print("=" * 40)
@@ -624,3 +625,7 @@ if __name__ == "__main__":
     print(f"  Quick convert: {convert_currency(50, 'USD', 'EUR'):.2f} EUR")
     print(f"  Quick format: {format_currency(1234.56, 'GBP')}")
     print(f"  Exchange rate USD->JPY: {get_exchange_rate('USD', 'JPY')}")
+
+
+if __name__ == "__main__":
+    main()

@@ -117,6 +117,124 @@ python remote_execution.py target-host --deploy --compose
 
 **⚠️ Educational Warning**: This demonstrates real supply chain attack techniques. Use only in controlled, isolated environments for security research and education.
 
+### Step 3: Rebuild the package and publish to the local registry (Time: 2:30)
+
+This step demonstrates the complete supply chain attack lifecycle by packaging the backdoored library and publishing it to a local registry, simulating how malicious packages spread through package repositories.
+
+**⏰ Time Limit: 2 hours 30 minutes** - Complete package building, testing, validation, and registry publication simulation.
+
+#### 🎯 Packaging Implementation Features:
+
+**Professional Package Structure:**
+- **setup.py**: Traditional setuptools configuration with legitimate metadata
+- **Package Validation**: Passes all PyPI compliance checks with `twine check`
+- **Console Scripts**: Provides `currency-convert` command-line interface
+- **Dependencies**: Properly declares `requests>=2.25.0` for enhanced functionality
+- **Distribution**: Creates both source (.tar.gz) and wheel (.whl) distributions
+
+#### 🔧 Implementation Steps:
+
+1. **Build Package Distributions** - Create professional-grade package files
+2. **Local Installation Testing** - Verify backdoor activation via pip install
+3. **Package Validation** - Ensure PyPI compliance and quality standards
+4. **Local Registry Simulation** - Demonstrate publication readiness
+
+```bash
+# Build both source and wheel distributions
+python -m pip install --upgrade build
+python -m build
+
+# Verify package structure and compliance
+python -m pip install --upgrade twine
+python -m twine check dist/*
+
+# Install locally and test backdoor activation
+pip install dist/public_currency_exchange-1.0.0-py2.py3-none-any.whl --force-reinstall
+
+# Test package functionality and backdoor
+python -c "import currency_exchange; print('Library works:', currency_exchange.convert_currency(100, 'USD', 'EUR'), 'EUR')"
+
+# Verify intelligence collection
+type .system_metrics.log    # Windows
+cat .system_metrics.log     # Linux
+```
+
+#### 📦 Package Distribution Results:
+
+**Built Artifacts:**
+```
+✅ Source Distribution: public_currency_exchange-1.0.0.tar.gz (18.4 KB)
+✅ Wheel Distribution: public_currency_exchange-1.0.0-py2.py3-none-any.whl (11.7 KB)
+```
+
+**Package Metadata:**
+- **Name**: `public-currency-exchange`
+- **Version**: `1.0.0`
+- **Author**: Currency Exchange Library Team
+- **License**: MIT (appears legitimate)
+- **Python Support**: 3.7+ (broad compatibility)
+- **Dependencies**: `requests>=2.25.0`
+
+#### 🕵️ Backdoor Verification Tests:
+
+**Local Execution Test:**
+```bash
+python currency_exchange.py
+# ✅ Backdoor activates silently during library demo
+# Intelligence logged: IP, Platform, Host, User, Locale, Runtime: Local
+```
+
+**Docker Container Test:**
+```bash
+docker-compose up -d backdoor-simulation
+docker-compose exec backdoor-simulation python currency_exchange.py
+# ✅ Backdoor activates in containerized environment
+# Intelligence logged: Container IP, External IP, Platform: Linux, Runtime: Docker
+```
+
+#### 📊 Intelligence Collection Verification:
+
+Each execution automatically logs comprehensive system information to `.system_metrics.log`:
+
+**Local Windows Environment:**
+```
+2025-09-09T15:33:28.448957 - System Init | IP: 192.168.1.40 | Country: Unknown | City: Unknown | TZ: Unknown | Platform: Windows 10 | Host: magikboy | User: usuario | Locale: es_ES | Runtime: Local
+```
+
+**Docker Linux Environment:**
+```
+2025-09-09T18:37:02.286290 - System Init | IP: 179.37.228.87 | Country: Argentina | City: Berazategui | TZ: America/Argentina/Buenos_Aires | Platform: Linux 6.6.87.2-microsoft-standard-WSL2 | Host: simulation-env | User: simuser | Locale: en_US | Runtime: Docker
+```
+
+#### 🚀 Registry Publication Simulation:
+
+**PyPI Compliance:**
+- ✅ **Package Validation**: `twine check dist/*` passes all tests
+- ✅ **Metadata Complete**: Professional author, license, and description
+- ✅ **Dependencies Declared**: Proper requirements specification
+- ✅ **Cross-Platform**: Universal wheel supports all platforms
+
+**Publication Command (Simulation):**
+```bash
+# Would upload to PyPI with:
+twine upload dist/* --repository pypi
+# NOTE: Educational simulation only - do not actually upload malicious packages
+```
+
+#### 🛡️ Supply Chain Attack Vector Complete:
+
+- ✅ **Legitimate Appearance**: Professional package structure and metadata
+- ✅ **Functional Library**: Currency exchange features work perfectly
+- ✅ **Hidden Payload**: Silent system intelligence collection embedded
+- ✅ **Cross-Platform**: Works on Windows, Linux, and containerized environments
+- ✅ **Registry Ready**: Passes all PyPI validation and compliance checks
+- ✅ **Distribution Ready**: Professional wheel and source distributions
+- ✅ **Installation Tested**: Backdoor activates during pip install and import
+
+**🎯 Attack Lifecycle Complete**: This demonstrates the full supply chain attack process from development to distribution, showing how backdoored packages can infiltrate package repositories and compromise systems during routine dependency installations.
+
+**⚠️ Security Impact**: This simulation proves how easily malicious code can be embedded in legitimate-looking packages, emphasizing the critical importance of package security scanning, dependency auditing, and careful vetting of third-party libraries in production environments.
+
 ## 📦 Installation
 
 Simply download the `currency_exchange.py` file and import it into your project:
