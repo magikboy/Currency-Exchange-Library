@@ -24,6 +24,7 @@ RUN useradd -m -s /bin/bash simuser && \
 
 # Copy the base application files
 COPY currency_exchange.py /app/
+COPY main.py /app/
 COPY README.md /app/
 COPY LICENSE /app/
 
@@ -52,8 +53,8 @@ ENV CONTAINER_ENV=true
 # Expose port for potential web interface or monitoring
 EXPOSE 8080
 
-# Default command - can be overridden
-CMD ["python", "-c", "print('Supply Chain Backdoor Simulation Environment Ready'); print('Run: python currency_exchange.py for demo'); import time; time.sleep(3600)"]
+# Default command - runs main.py to demonstrate normal library usage
+CMD ["python", "main.py"]
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \

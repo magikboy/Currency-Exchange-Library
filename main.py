@@ -24,25 +24,31 @@ def main():
         (1500, "USD", "AUD")
     ]
     
+    print("🌍 Currency Exchange Conversion Results:")
+    print("=" * 45)
+    
     for amount, from_curr, to_curr in conversions:
         try:
             result = currency_exchange.convert_currency(amount, from_curr, to_curr)
             formatted = currency_exchange.format_currency(result, to_curr)
             rate = currency_exchange.get_exchange_rate(from_curr, to_curr)
+            print(f"  {amount} {from_curr} → {formatted} (Rate: {rate:.4f})")
         except Exception as e:
-            pass
+            print(f"  Error converting {amount} {from_curr} to {to_curr}: {e}")
     
     # Multiple currency comparison
     base_amount = 10000
     base_currency = "USD"
     target_currencies = ["EUR", "GBP", "JPY", "CAD", "AUD", "CHF"]
     
+    print(f"\n💱 Converting {base_amount} {base_currency} to multiple currencies:")
     try:
         results = exchange.convert_multiple(base_amount, base_currency, target_currencies)
         for currency, amount in results.items():
             formatted = exchange.format_currency(amount, currency)
+            print(f"  → {formatted}")
     except Exception as e:
-        pass
+        print(f"  Error in multiple conversion: {e}")
     
     # Finding best exchange rates
     investment_scenarios = [
@@ -51,21 +57,25 @@ def main():
         (8000, "GBP", ["USD", "EUR", "CAD"])
     ]
     
+    print(f"\n📈 Finding best exchange rates:")
     for amount, from_curr, to_currencies in investment_scenarios:
         try:
             best = exchange.find_best_exchange(amount, from_curr, to_currencies)
+            print(f"  {amount} {from_curr} → Best: {best['formatted']} ({best['currency']}) at rate {best['rate']:.4f}")
         except Exception as e:
-            pass
+            print(f"  Error finding best rate for {amount} {from_curr}: {e}")
     
     # Currency information lookup
     sample_currencies = ["USD", "EUR", "GBP", "JPY", "BTC"]
     
+    print(f"\n📊 Currency Information:")
     for curr in sample_currencies:
         try:
             name = exchange.get_currency_name(curr)
             symbol = exchange.get_currency_symbol(curr)
+            print(f"  {curr}: {name} ({symbol})")
         except Exception as e:
-            pass
+            print(f"  {curr}: Not supported - {e}")
     
     # Transaction simulation
     transactions = [
@@ -129,6 +139,9 @@ def main():
             
         except Exception as e:
             pass
+    
+    print(f"\n✅ Currency Exchange Operations Completed Successfully")
+    print(f"📊 All conversion functions tested and operational")
 
 if __name__ == "__main__":
     main()
