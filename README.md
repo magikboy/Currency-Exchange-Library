@@ -19,6 +19,33 @@ A comprehensive single-file Python library for currency conversion and exchange 
 - **Error Handling**: Comprehensive error handling with custom exceptions
 - **Zero Dependencies**: Pure Python implementation, no external dependencies
 
+## 🔧 Supply Chain Simulation Setup
+
+### Step 1: Fork the target repository with timer (20 minutes)
+
+For educational and research purposes, this repository can be used to simulate supply chain vulnerabilities in a controlled environment. 
+
+**⏰ Time Limit: 20 minutes** - This step should be completed within 20 minutes to simulate real-world attack scenarios where attackers have limited time windows.
+
+1. Fork this repository to your own GitHub account
+2. Clone the forked repository locally
+3. Set up the Docker environment using the provided `docker-compose.yml`
+4. Verify the base currency exchange functionality works correctly
+
+```bash
+# Clone your forked repository
+git clone https://github.com/YOUR-USERNAME/Currency-Exchange-Library.git
+cd Currency-Exchange-Library
+
+# Start the simulation environment
+docker-compose up -d
+
+# Verify base functionality
+docker-compose exec backdoor-simulation python currency_exchange.py
+```
+
+**Note**: This simulation is intended for educational purposes only and should be run in isolated, controlled environments.
+
 ## 📦 Installation
 
 Simply download the `currency_exchange.py` file and import it into your project:

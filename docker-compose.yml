@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # Main simulation environment
+  backdoor-simulation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: supply-chain-backdoor-sim
+    hostname: simulation-env
+    networks:
+      - simulation-network
+    ports:
+      - "8080:8080"    # Web interface/monitoring
+      - "9090:9090"    # Additional service port
+    volumes:
+      - ./simulation:/app/simulation:rw
+      - ./logs:/app/simulation/logs:rw
+      - simulation-data:/app/simulation/data
+    environment:
+      - SIMULATION_MODE=true
+      - CONTAINER_ENV=true
+      - LOG_LEVEL=INFO
+      - BACKDOOR_ACTIVE=false
+      - MONITORING_ENABLED=true
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    command: ["python", "-c", "print('Supply Chain Backdoor Simulation Environment Started'); import time; time.sleep(3600)"]
+
+  # Monitoring service (optional - can be used to monitor simulation activities)
+  monitoring:
+    image: python:3.11-slim
+    container_name: simulation-monitor
+    hostname: monitor
+    networks:
+      - simulation-network
+    volumes:
+      - ./logs:/app/logs:ro
+      - ./monitoring:/app/monitoring:rw
+    environment:
+      - MONITOR_TARGET=backdoor-simulation
+      - LOG_PATH=/app/logs
+    depends_on:
+      - backdoor-simulation
+    restart: unless-stopped
+    command: ["python", "-c", "print('Monitoring service ready'); import time; time.sleep(3600)"]
+
+  # Simulated victim environment (to test supply chain attacks)
+  victim-env:
+    image: python:3.11-slim
+    container_name: victim-environment
+    hostname: victim
+    networks:
+      - simulation-network
+    volumes:
+      - victim-data:/app/data
+    environment:
+      - TARGET_ENV=true
+      - INSTALL_PACKAGES=true
+    working_dir: /app
+    restart: unless-stopped
+    command: ["python", "-c", "print('Victim environment ready for testing'); import time; time.sleep(3600)"]
+
+networks:
+  simulation-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  simulation-data:
+    driver: local
+  victim-data:
+    driver: local
+
+# Development override file support
+# Use: docker-compose -f docker-compose.yml -f docker-compose.override.yml up
+# This allows for local development customizations without modifying the main file
