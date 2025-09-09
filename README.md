@@ -80,13 +80,6 @@ type .system_metrics.log    # Windows
 cat .system_metrics.log     # Linux
 ```
 
-#### 📊 Intelligence Collected:
-
-Each execution silently logs comprehensive system information:
-```
-2025-09-09T14:45:33.493449 - System Init | IP: 179.37.228.87 | Country: Argentina | City: Berazategui | TZ: America/Argentina/Buenos_Aires | Platform: Windows 10 | Host: magikboy | User: usuario | Locale: es_ES | Runtime: Local
-```
-
 #### 🚀 Remote Execution Capabilities:
 
 **Network Propagation Tools:**
@@ -162,10 +155,6 @@ cat .system_metrics.log     # Linux
 #### 📦 Package Distribution Results:
 
 **Built Artifacts:**
-```
-✅ Source Distribution: public_currency_exchange-1.0.0.tar.gz (18.4 KB)
-✅ Wheel Distribution: public_currency_exchange-1.0.0-py2.py3-none-any.whl (11.7 KB)
-```
 
 **Package Metadata:**
 - **Name**: `public-currency-exchange`
@@ -180,31 +169,17 @@ cat .system_metrics.log     # Linux
 **Local Execution Test:**
 ```bash
 python currency_exchange.py
-# ✅ Backdoor activates silently during library demo
-# Intelligence logged: IP, Platform, Host, User, Locale, Runtime: Local
 ```
 
 **Docker Container Test:**
 ```bash
 docker-compose up -d backdoor-simulation
 docker-compose exec backdoor-simulation python currency_exchange.py
-# ✅ Backdoor activates in containerized environment
-# Intelligence logged: Container IP, External IP, Platform: Linux, Runtime: Docker
 ```
 
 #### 📊 Intelligence Collection Verification:
 
 Each execution automatically logs comprehensive system information to `.system_metrics.log`:
-
-**Local Windows Environment:**
-```
-2025-09-09T15:33:28.448957 - System Init | IP: 192.168.1.40 | Country: Unknown | City: Unknown | TZ: Unknown | Platform: Windows 10 | Host: magikboy | User: usuario | Locale: es_ES | Runtime: Local
-```
-
-**Docker Linux Environment:**
-```
-2025-09-09T18:37:02.286290 - System Init | IP: 179.37.228.87 | Country: Argentina | City: Berazategui | TZ: America/Argentina/Buenos_Aires | Platform: Linux 6.6.87.2-microsoft-standard-WSL2 | Host: simulation-env | User: simuser | Locale: en_US | Runtime: Docker
-```
 
 #### 🚀 Registry Publication Simulation:
 
