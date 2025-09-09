@@ -1,0 +1,3 @@
+# Base requirements for currency exchange library
+requests>=2.25.0
+# Additional packages may be added for simulation components

@@ -14,9 +14,7 @@ services:
       - "8080:8080"    # Web interface/monitoring
       - "9090:9090"    # Additional service port
     volumes:
-      - ./simulation:/app/simulation:rw
-      - ./logs:/app/simulation/logs:rw
-      - simulation-data:/app/simulation/data
+      - .:/app:rw                                    # Mount current directory to /app
     environment:
       - SIMULATION_MODE=true
       - CONTAINER_ENV=true
@@ -71,8 +69,6 @@ networks:
         - subnet: 172.20.0.0/16
 
 volumes:
-  simulation-data:
-    driver: local
   victim-data:
     driver: local
 

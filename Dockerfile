@@ -30,12 +30,9 @@ COPY LICENSE /app/
 # Set up Python environment
 RUN pip install --no-cache-dir --upgrade pip
 
-# Create directories for simulation components
-RUN mkdir -p /app/simulation \
-    /app/simulation/backdoor \
-    /app/simulation/logs \
-    /app/simulation/data \
-    /app/simulation/monitoring
+# Copy and install requirements
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Create a requirements file for potential dependencies
 RUN echo "# Base requirements for currency exchange library" > requirements.txt && \

@@ -128,22 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+# System metrics log file (local development only)
+.system_metrics.log
 
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Exchange rate data files
-rates_*.json
-exchange_data/
+# Remote execution log file
+.remote_execution.log
